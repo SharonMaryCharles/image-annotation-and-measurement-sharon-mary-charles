@@ -1,0 +1,218 @@
+<section class="section my-4" style="background-color: cadetblue;">
+  <div class="container-sm text-center">
+    <section class="mt-10">
+  
+      <div class="col-10">
+        <p class="selectedImage" ><strong style="margin-left: 20%; font-size:2em;">Selected Image</strong></p>
+        <p style="margin-left: 20%; font-size:1em; color:orange;"> A Canvas Box is Provided Below the Image to Annotate</p>
+        <div class="card shadow" style="width: 20rem;">
+                                                    
+          <img class="section my-4 container-fluid mb-50 col-20" id="currentImg" src='data:{{contentType}};base64,{{imageBase64}}' class="card-img-top" class="img-fluid" alt="...">
+
+          <canvas id="mycanvas"></canvas>
+
+          <div class="card-body shadow">
+            <textarea class="form-control" rows="2" placeholder="Enter Annotation"></textarea>
+          </div>
+
+        </div>
+      </div>
+  </div>
+</section>
+
+
+<section class="section my-4">
+  <div class="container text-center">
+    <a class="btn btn-warning" href="/" style="text-decoration: none; color:black; border: 10vh; font-size:1.2em" >Back to Home</a>
+  </div>
+</section>
+
+<!-- canvas.handlebars -->
+<!-- Add the following script tag in the head section -->
+<script>
+   
+  const canvas = document.getElementById('mycanvas');
+  const context = canvas.getContext('2d');
+  const keypoints = [];
+
+  // Function to add a keypoint
+  function addKeypoint(event) 
+  {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    keypoints.push({ x, y });
+    drawKeypoints();
+  }
+
+  // Function to delete a keypoint
+  function deleteKeypoint(event) 
+  {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    const index = keypoints.findIndex((keypoint) => 
+    {
+      const distance = Math.sqrt((keypoint.x - x) ** 2 + (keypoint.y - y) ** 2);
+      return distance <= 10; // Check if the distance is within a threshold (e.g., 10 pixels)
+    });
+
+    if (index !== -1) 
+    {
+      keypoints.splice(index, 1);
+      drawKeypoints();
+    }
+  }
+
+  // Function to draw keypoints on the canvas
+  function drawKeypoints() 
+  {
+    // Clear the canvas
+    context.clearRect(0, 0, 400, 500);
+
+    // Draw the image
+    const image = new Image();
+    image.src = "{{image.imageBase64}}";
+    image.onload = function () 
+    {
+      context.drawImage(image, 0, 0, image.width, image.height); //
+    };
+
+    // Draw the keypoints
+    keypoints.forEach((keypoint) => 
+    {
+      context.beginPath();
+      context.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
+      context.fillStyle = "red";
+      context.fill();
+      context.closePath();
+    });
+
+    // Draw lines between keypoints
+    if (keypoints.length >= 2) 
+    {
+      for (let i = 1; i < keypoints.length; i++) 
+      {
+        const start = keypoints[i - 1];
+        const end = keypoints[i];
+        context.beginPath();
+        context.moveTo(start.x, start.y);
+        context.lineTo(end.x, end.y);
+        context.strokeStyle = "blue";
+        context.lineWidth = 2;
+        context.stroke();
+        context.closePath();
+      }
+
+      // Calculate and display the distance between two selected keypoints
+      // Example: Distance between first and last keypoint
+      const firstKeypoint = keypoints[0];
+      const lastKeypoint = keypoints[keypoints.length - 1];
+      const distance = Math.sqrt
+      (
+        (lastKeypoint.x - firstKeypoint.x) ** 2 + (lastKeypoint.y - firstKeypoint.y) ** 2
+      );
+      
+      const distanceText = `Distance: ${distance.toFixed(2)} px`;
+      context.font = "12px Arial";
+      context.fillStyle = "black";
+      context.fillText(distanceText, lastKeypoint.x + 10, lastKeypoint.y);
+    }
+  }
+
+  // Event listeners for adding and deleting keypoints
+  canvas.addEventListener("click", addKeypoint);
+  canvas.addEventListener("contextmenu", deleteKeypoint);
+
+  // Function to move a keypoint
+  function moveKeypoint(event) 
+  {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    const index = keypoints.findIndex((keypoint) => 
+    {
+      const distance = Math.sqrt((keypoint.x - x) ** 2 + (keypoint.y - y) ** 2);
+
+      return distance <= 10; // Check if the distance is within a threshold (e.g., 10 pixels)
+    });
+
+    if (index !== -1) 
+    {
+      const keypoint = keypoints[index];
+      keypoint.x = x;
+      keypoint.y = y;
+      drawKeypoints();
+    }
+  }
+
+  canvas.addEventListener("mousedown", (event) => 
+  {
+    canvas.addEventListener("mousemove", moveKeypoint);
+  });
+
+  // Event listener to stop moving keypoints
+  canvas.addEventListener("mouseup", () => 
+  {
+    canvas.removeEventListener("mousemove", moveKeypoint);
+  });
+
+
+  // Track the selected keypoints
+  let selectedKeypoints = [];
+
+  // Function to select keypoints
+  function selectKeypoint(event) 
+  {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    // If there are already two selected keypoints, clear the selection
+    if (selectedKeypoints.length === 2) 
+    {
+      selectedKeypoints = [];
+    }
+
+    // Check if there is a keypoint within the click area
+    const index = keypoints.findIndex((keypoint) => 
+    {
+      const distance = Math.sqrt((keypoint.x - x) ** 2 + (keypoint.y - y) ** 2);
+      return distance <= 10; // Check if the distance is within a threshold (e.g., 10 pixels)
+    });
+
+    // If a keypoint is found, add it to the selected keypoints
+    if (index !== -1) 
+    {
+      const keypoint = keypoints[index];
+      selectedKeypoints.push(keypoint);
+    }
+
+    // If two keypoints are selected, perform the desired action (e.g., calculate distance)
+    if (selectedKeypoints.length === 2) 
+    {
+      const firstKeypoint = selectedKeypoints[0];
+      const lastKeypoint = selectedKeypoints[1];
+      const distance = Math.sqrt
+      (
+        (lastKeypoint.x - firstKeypoint.x) ** 2 + (lastKeypoint.y - firstKeypoint.y) ** 2
+      );
+
+      // Perform the desired action with the calculated distance
+      console.log(`Distance between selected keypoints: ${distance.toFixed(2)} pixels`);
+
+      // Clear the selected keypoints for the next selection
+      selectedKeypoints = [];
+    }
+
+    drawKeypoints();
+  }
+
+  // Event listener for selecting keypoints
+  canvas.addEventListener("click", selectKeypoint);
+
+  </script>
+  
+</body>

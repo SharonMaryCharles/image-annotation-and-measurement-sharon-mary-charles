@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&family=Roboto&display=swap');
+
+body
+{
+    font-family: 'Roboto', sans-serif;
+    background-color: cadetblue;
+}
+
+.font-poppins
+{
+    font-family: 'Poppins', sans-serif;
+}
+
+.font-size-09
+{
+    font-size: .9em;
+}
+
+input:focus
+{
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+footer
+{
+    font-family: 'Poppins', sans-serif;
+    font-weight: 300;
+    display: right;
+    font-size: 1em;
+    text-align: center;
+}
+
+a
+{
+    text-decoration: none;
+    color: black;
+}
+
+a:hover 
+{
+    color: darkgray; 
+}
+
+section div div h1 a
+{
+    text-decoration: none;
+    color: black;
+}
+
+.card-body shadow
+{
+    height: 50vh;
+}
+
+.col-10
+{
+    font-size: 1em;
+}
+
+.card-body {
+    position: relative;
+}
+  
+
+#mycanvas 
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+     /* pointer-events: none; This prevents the canvas from capturing mouse events */
+    width: 500px;
+    height: 300px;
+    background-color: cadetblue;
+}
+
+.section my-4 .container text-center .col-21
+{
+    text-decoration: none;
+    color: black;
+}
+
+.custom-btn 
+{
+    background-color: yellow;
+  }
+
+.btn-primary
+{
+    background-color: orange;
+}
+
+.subtitle
+{
+    color: orange;
+}
+
+footer 
+{
+    text-align: center;
+}
+
+section
+{
+    background-color: cadetblue;
+}
