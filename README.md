@@ -4,7 +4,6 @@
 # Email : scharles@stevens.edu
 
 # Website for In The Loop : Image Annotation and Measurements
-
 # Technlogies Used : JavaScript, NodeJS, ExpressJS, MongoDB, Multer Middleware, Handlebars, HTML, CSS, BootStrap.
 
 # Steps to Run the Project :
